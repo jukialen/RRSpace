@@ -1,0 +1,12 @@
+FROM golang:1.23-bookworm AS builder
+
+WORKDIR /app
+
+# Najpierw skopiuj tylko go.mod/go.sum (cache warstw)
+COPY go.mod go.sum* ./
+RUN go mod download
+
+# Potem resztę kodu
+COPY . .
+
+RUN CGO_ENABLED=0 go build -o /usr/local/bin/app .
