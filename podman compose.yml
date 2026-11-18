@@ -1,7 +1,7 @@
 services:
   redis:
     image: redis:8.10.3
-    container_name: studio_now_redis
+    container_name: rr_space_redis
     ports:
       - "6379:6379"
     restart: always
@@ -10,7 +10,7 @@ services:
     build:
       context: ./backend
       dockerfile: Containerfile
-    container_name: studio_now__backend
+    container_name: rr_space__backend
     volumes:
       - ./backend:/app
     ports:
