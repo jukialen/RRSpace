@@ -1,5 +1,5 @@
 <script lang="ts">
-	import DemoLinks from './demo/DemoLinks.svelte';
+
 	import type { Path } from '$app/types';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
@@ -21,5 +21,3 @@
 		<a href={resolve(localizeHref(page.url.pathname, { locale }) as Path)}>{locale}</a>
 	{/each}
 </div>
-
-<DemoLinks />
