@@ -1,19 +1,33 @@
 services:
-  image: postgres:18.7
-  container_name: rr_space__postgres
-  environment:
-    POSTGRES_USER: ${DB_USER}
-    POSTGRES_PASSWORD: ${DB_PASSWORD}
-    POSTGRES_DB: ${DB_NAME}
-  ports:
-    - "5432:5432"
-  volumes:
-    - pgdata:/var/lib/postgresql/data
-  healthcheck:
-    test: [ "CMD-SHELL", "pg_isready -U ${DB_USER}" ]
-    interval: 5s
-    timeout: 3s
-    retries: 5
+  postgres:
+    image: postgres:17
+    container_name: rr_space__postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:9.19.0
+    container_name: rr_space__pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${UI_DB_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${UI_DB_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: ${UI_DB_SERVER_MODE}
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: always
 
   redis:
     image: redis:8.10.3
@@ -38,14 +52,15 @@ services:
       - ./backend:/app
     ports:
       - "8080:8080"
-    command: go run main.go
+    command: go run cmd/api/main.go
     environment:
       - PORT=8080
       - REDIS_HOST=redis
-    postgres:
-      condition: service_healthy
-    redis:
-      condition: service_healthy
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: always
 
 volumes:

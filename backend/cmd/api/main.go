@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/rrspace/backend/internal/cache"
-	"github.com/rrspace/backend/internal/config"
-	"github.com/rrspace/backend/internal/database"
-	"github.com/rrspace/backend/internal/router"
-	"github.com/rrspace/backend/internal/storage"
+	"rrspace/backend/internal/cache"
+	"rrspace/backend/internal/config"
+	"rrspace/backend/internal/database"
+	"rrspace/backend/internal/router"
+	"rrspace/backend/internal/storage"
 )
 
 func main() {
@@ -22,12 +22,16 @@ func main() {
 		log.Fatalf("config load error: %v", err)
 	}
 
+
 	// PostgreSQL (Neon)
 	db, err := database.Connect(cfg)
 	if err != nil {
 		log.Fatalf("database connect error: %v", err)
 	}
-	defer db.Close()
+	sqlDB, err := db.DB()
+	if err == nil {
+		defer sqlDB.Close()
+	}
 
 	// Redis
 	redisClient := cache.NewRedisClient(cfg)

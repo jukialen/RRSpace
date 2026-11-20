@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/studiobooking/go-api/internal/middleware"
+	"rrspace/backend/internal/middleware"
 )
 
 type AuthHandler struct{}

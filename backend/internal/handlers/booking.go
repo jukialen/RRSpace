@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/studiobooking/go-api/internal/middleware"
-	"github.com/studiobooking/go-api/internal/models"
+	"rrspace/backend/internal/middleware"
+	"rrspace/backend/internal/models"
 	"gorm.io/gorm"
 )
 

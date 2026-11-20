@@ -1,8 +1,11 @@
 package cache
 
 import (
+	"context"
+	"time"
+
 	"github.com/redis/go-redis/v9"
-	"github.com/studiobooking/go-api/internal/config"
+	"rrspace/backend/internal/config"
 )
 
 type RedisClient struct {
@@ -19,11 +22,11 @@ func NewRedisClient(cfg *config.Config) *RedisClient {
 }
 
 func (rc *RedisClient) Get(key string) (string, error) {
-	return rc.client.Get(rc.ctx()).Result()
+	return rc.client.Get(rc.ctx(), key).Result()
 }
 
 func (rc *RedisClient) Set(key, value string, ttl int) error {
-	return rc.client.Set(rc.ctx(), key, value, ttl).Err()
+	return rc.client.Set(rc.ctx(), key, value, time.Duration(ttl)*time.Second).Err()
 }
 
 func (rc *RedisClient) Del(key string) error {

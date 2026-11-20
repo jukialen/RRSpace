@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/studiobooking/go-api/internal/config"
+	"rrspace/backend/internal/config"
 )
 
 type R2Client struct {
@@ -29,7 +29,7 @@ func NewR2Client(cfg *config.Config) *R2Client {
 	return &R2Client{client: client, bucket: cfg.R2Bucket}
 }
 
-// UploadFile wysyła plik do R2 i zwraca publiczny URL
+// UploadFile wysyła plik do R2 i zwraca presigned URL
 func (r *R2Client) UploadFile(ctx context.Context, key string, body io.Reader, contentType string) (string, error) {
 	_, err := r.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(r.bucket),
@@ -40,31 +40,31 @@ func (r *R2Client) UploadFile(ctx context.Context, key string, body io.Reader, c
 	if err != nil {
 		return "", err
 	}
-
-	url := r.client.URLForPresigned(ctx, &s3.GetObjectInput{
+	presignClient := s3.NewPresignClient(r.client)
+	req, err := presignClient.PresignGetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(r.bucket),
 		Key:    aws.String(key),
 	}, func(o *s3.PresignOptions) {
 		o.Expires = 365 * 24 * time.Hour
 	})
-
-	return url, nil
+	if err != nil {
+		return "", err
+	}
+	return req.URL, nil
 }
 
 // PresignedUploadURL — zwraca URL do bezpośredniego uploadu z frontendu
+// PresignedUploadURL — zwraca URL do bezpośredniego uploadu z frontendu
 func (r *R2Client) PresignedUploadURL(ctx context.Context, key string) (string, error) {
-	uploader := s3.NewUploadManager(r.client)
-
-	request, err := s3.NewPutObjectRequest(ctx, &s3.PutObjectInput{
+	presignClient := s3.NewPresignClient(r.client)
+	req, err := presignClient.PresignPutObject(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(r.bucket),
 		Key:    aws.String(key),
+	}, func(o *s3.PresignOptions) {
+		o.Expires = 15 * time.Minute
 	})
 	if err != nil {
 		return "", err
 	}
-
-	// W praktyce użyj s3.PresignClient do wygenerowania presigned URL
-	_ = uploader
-	_ = request
-	return "", nil // placeholder — uzupełnij wg SDK
+	return req.URL, nil
 }

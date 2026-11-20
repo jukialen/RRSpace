@@ -1,4 +1,4 @@
-module studio_now/backend
+module rrspace/backend
 
 go 1.23.12
 
