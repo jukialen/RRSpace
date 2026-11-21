@@ -33,7 +33,7 @@ services:
     image: redis:8.10.3
     container_name: rr_space_redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     depends_on:
       - postgres
     healthcheck:
@@ -51,17 +51,34 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - "8080:8080"
-    command: go run cmd/api/main.go
-    environment:
-      - PORT=8080
-      - REDIS_HOST=redis
+      - "${BC_PORT}:${BC_PORT}"
+    command: sh -c "go mod tidy && go run cmd/api/main.go"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      BC_PORT: ${BC_PORT}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      APPWRITE_REGION: ${APPWRITE_REGION}
+      APPWRITE_PROJECT_ID: ${APPWRITE_PROJECT_ID}
+      APPWRITE_API_KEY: ${APPWRITE_API_KEY}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      R2_BUCKET: ${R2_BUCKET}
+      R2_ACCESS_KEY: ${R2_ACCESS_KEY}
+      R2_SECRET_KEY: ${R2_SECRET_KEY}
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
+      JWT_SECRET: ${JWT_SECRET}
     restart: always
 
 volumes:
   pgdata:
+  

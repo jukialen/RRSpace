@@ -10,5 +10,11 @@
 		"prettier.config.js",
 		"eslint.config.js",
 		"playwright.config.ts"
+	],
+	"exclude": [
+		"src/service-worker",
+		"src/service-worker.js",
+		"src/service-worker.ts",
+		"src/service-worker.d.ts"
 	]
 }

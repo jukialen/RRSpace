@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"github.com/appwrite/sdk-for-go/v7/appwrite"
 )
 
 type Config struct {
@@ -41,27 +42,31 @@ type Config struct {
 
 func Load() (*Config, error) {
 	cfg := &Config{
-		AppEnv:            envOrDefault("APP_ENV", "development"),
-		Port:              envOrDefault("PORT", "8080"),
-		DBHost:            envOrDefault("DB_HOST", "localhost"),
-		DBPort:            envOrDefault("DB_PORT", "5432"),
-		DBUser:            envOrDefault("DB_USER", "postgres"),
-		DBPassword:        envOrDefault("DB_PASSWORD", "postgres"),
-		DBName:            envOrDefault("DB_NAME", "studio_booking"),
-		RedisHost:         envOrDefault("REDIS_HOST", "localhost"),
-		RedisPort:         envOrDefault("REDIS_PORT", "6379"),
-		R2Endpoint:      envOrDefault("R2_ENDPOINT", ""),
-		R2Bucket:        envOrDefault("R2_BUCKET", "studio-photos"),
-		R2AccessKey:     os.Getenv("R2_ACCESS_KEY"),
-		R2SecretKey:     os.Getenv("R2_SECRET_KEY"),
-		R2AccountID:     os.Getenv("R2_ACCOUNT_ID"),
-		JWTSecret:       envOrDefault("JWT_SECRET", "dev-secret"),
+		AppEnv:            os.Getenv("APP_ENV"),
+		Origin:            os.Getenv("ORIGIN"),
+	BcPort:              os.Getenv("BC_PORT"),
+		DBHost:            os.Getenv("DB_HOST"),
+		DBPort:            os.Getenv("DB_PORT"),
+		DBUser:            os.Getenv("DB_USER"),
+		DBPassword:        os.Getenv("DB_PASSWORD"),
+		DBName:            os.Getenv("DB_NAME"),
+		RedisHost:         os.Getenv("REDIS_HOST"),
+		RedisPort:         os.Getenv("REDIS_PORT"),
+		R2Endpoint:        os.Getenv("R2_ENDPOINT"),
+		R2Bucket:          os.Getenv("R2_BUCKET"),
+		R2AccessKey:       os.Getenv("R2_ACCESS_KEY"),
+		R2SecretKey:       os.Getenv("R2_SECRET_KEY"),
+		R2AccountID:	     os.Getenv("R2_ACCOUNT_ID"),
+		JWTSecret:    	   os.Getenv("JWT_SECRET"),
+		AppwriteRegion:    os.Getenv("APPWRITE_REGION"),
+		AppwriteProjectID: os.Getenv("APPWRITE_PROJECT_ID"),
+		AppwriteAPIKey:    os.Getenv("APPWRITE_API_KEY"),
 	}
 
 	return cfg, nil
 }
 
-func envOrDefault(key, fallback string) string {
+func os.Getenv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
 	}
@@ -79,4 +84,12 @@ func (c *Config) DBDSN() string {
 
 func (c *Config) RedisAddr() string {
 	return c.RedisHost + ":" + c.RedisPort
+}
+
+func configAppwrite() {
+ appwrite.NewClient(
+	appwrite.WithEndpoint("https://" + c.AppwriteRegion + ".cloud.appwrite.io/v1"),
+	appwrite.WithProject(c.AppwriteProjectID),
+	appwrite.WithKey(c.AppwriteAPIKey),
+)	
 }
